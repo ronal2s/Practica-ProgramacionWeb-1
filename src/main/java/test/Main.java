@@ -11,7 +11,6 @@ public class Main {
     public static void main(String[] args) {
         Scanner teclado = new Scanner(System.in);
         Document doc = null;
-//        String url = "https://campusvirtual.pucmm.edu.do/";
         System.out.println("Escribir URL:");
         String url = teclado.nextLine();
         try {
@@ -54,19 +53,26 @@ public class Main {
         }
     }
 
-    private static void postURL(Document doc, String url) {
-        String urlFixed = "https://"+url.split("/")[2]+'/';
-        Elements posts = doc.select("form[method=POST]");
-        System.out.println("Haciendo POST a esta URL: " + urlFixed);
-        for(Element post: posts) {
+    private static void postURL(Document doc, String url){
+        Elements postForms = doc.select("form[method=\"POST\"]");
+        String newstr = url;
+        if (null != url && url.length() > 0 )
+        {
+            int endIndex = url.lastIndexOf("/");
+            if (endIndex != -1 || endIndex != 6 || endIndex != 7)
+            {
+                newstr = url.substring(0, endIndex);
+            }
+        }
+
+        for (Element el:postForms) {
             try {
-                //Usando la URL exactamente como se introdujo
-//                Document post_request = Jsoup.connect(post.attr("action")).header("matricula", "20160207").data("asignatura", "practica1").post();
-                //Usando la URL limpia
-                Document post_request = Jsoup.connect(urlFixed).header("matricula", "20160207").data("asignatura", "practica1").post();
-                System.out.println("Respuesta: " + post_request.html());
-            } catch(IOException e) {
-                System.out.println("Error ejecutando el POST: " + e.toString());
+                Document postReq = Jsoup.connect(newstr + el.attr("action")).header("matricula", "20160138")
+                        .data("asignatura","practica1").post();
+                System.out.println("Respuesta: ");
+                System.out.println(postReq.html());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
